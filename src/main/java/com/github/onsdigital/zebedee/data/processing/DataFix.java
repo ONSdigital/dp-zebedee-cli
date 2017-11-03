@@ -35,9 +35,9 @@ public class DataFix {
 
     static String[] files = {"0d170e32.json", "0d170e32.png", "0d170e32.xls", "71153eee.json", "data.json", "page.pdf"};
 
-    static final String DEST_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016";
-
     static final String CURRENT_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket";
+
+    static final String DEST_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016";
 
     public static void fix(String[] args) throws IOException, InterruptedException {
 
@@ -66,13 +66,27 @@ public class DataFix {
             File src = srcPath.resolve(filename).toFile();
 
             Path move = master.resolve(src.toPath());
-            System.out.println(format("src:\n\turi: {1}", move.toString()));
+            System.out.println(format("src:\n\turi: {0}", move.toString()));
 
             File dest = targetCollectionDir.resolve(filename).toFile();
             System.out.println(format("dest:\n\turi: {0}", dest.toString()));
 
             FileUtils.copyFile(src, dest);
         }
+
+        // fix the data in this file.
+        System.out.println("Fixing this data.json links...");
+        Path dataJsonPath = collectionRoot.resolve(targetCollectionDir).resolve("data.json");
+        String dataJson = new String(Files.readAllBytes(dataJsonPath));
+        dataJson = dataJson.replaceAll(CURRENT_DIR, DEST_DIR);
+
+        try (BufferedWriter br = Files.newBufferedWriter(dataJsonPath)) {
+            br.write(dataJson);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        System.out.println("fixed link in data.json");
 
 /*
         // fix the data in this file.
