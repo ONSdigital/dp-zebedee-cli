@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.text.MessageFormat.format;
+
 /**
  * Created by dave on 02/11/2017.
  */
@@ -45,7 +47,7 @@ public class DataFix {
         Path collectionsDir = Paths.get(args[2]);
         String collectionName = args[3];
 
-        System.out.println(MessageFormat.format("master: {0}, collectionsDir: {1}, collectionName: {2}", master,
+        System.out.println(format("master: {0}, collectionsDir: {1}, collectionName: {2}", master,
                 collectionsDir, collectionName));
 
         CollectionCreator.CreateCollection(collectionsDir, collectionName);
@@ -56,17 +58,18 @@ public class DataFix {
 
         List<String> moves = new ArrayList<>();
 
+        Path srcPath  = master.resolve("economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket");
         for (String filename : files) {
-            File src = master.resolve(currentDir).resolve(filename).toFile();
+            File src = srcPath.resolve(filename).toFile();
 
             Path move = master.resolve(src.toPath());
-            System.out.println(MessageFormat.format("src:\n\texists? {0}\n\turi: {1}" + Files.exists(move), move.toString()));
+            System.out.println(format("src:\n\texists? {0}\n\turi: {1}" + Files.exists(move), move.toString()));
 
             File dest = collectionRoot.resolve(targetDir).resolve(filename).toFile();
             dest.mkdirs();
-            System.out.println(MessageFormat.format("dest:\n\texists? {0}\n\turi: {1}" + Files.exists(dest.toPath()), dest.toString()));
+            System.out.println(format("dest:\n\texists? {0}\n\turi: {1}" + Files.exists(dest.toPath()), dest.toString()));
 
-            System.out.println(MessageFormat.format("copying: \n{0} \nto: {1}", src.toString(), dest.toString()));
+            System.out.println(format("copying: \n{0} \nto: {1}", src.toString(), dest.toString()));
             //FileUtils.copyFile(src, dest);
         }
 
