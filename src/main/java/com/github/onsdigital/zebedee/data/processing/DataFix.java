@@ -66,10 +66,10 @@ public class DataFix {
             File src = srcPath.resolve(filename).toFile();
 
             Path move = master.resolve(src.toPath());
-            System.out.println(format("src:\n\turi: {0}", move.toString()));
+            System.out.println(format("src: uri: {0}", move.toString()));
 
             File dest = targetCollectionDir.resolve(filename).toFile();
-            System.out.println(format("dest:\n\turi: {0}", dest.toString()));
+            System.out.println(format("dest: uri: {0}", dest.toString()));
 
             FileUtils.copyFile(src, dest);
         }
@@ -86,46 +86,26 @@ public class DataFix {
             System.out.println(e.toString());
         }
 
-        System.out.println("fixed link in data.json");
-
-/*
-        // fix the data in this file.
-        System.out.println("Fixing this data.json links...");
-
-        Path dataJsonPath = collectionRoot.resolve(targetDir).resolve("data.json");
-        String dataJson = new String(Files.readAllBytes(dataJsonPath));
-
-        dataJson = dataJson.replaceAll(currentPath, targetDir.toString());
-
-        try (BufferedWriter br = Files.newBufferedWriter(dataJsonPath)) {
-            br.write(dataJson);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-
-        System.out.println("Searching for broken links for: " + currentPath);
+        System.out.println("fixed link in moved data.json");
 
         List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(master);
         List<Path> brokenLinks = new ArrayList<>();
 
-
-        Path skip = currentDir.resolve("data.json");
-        System.out.println("skip uri: " + skip.toString());
+        System.out.println("Searching for broken links...");
         for (Path p : masterJsonFiles) {
-            if (p.equals(skip)) {
-                System.out.println("Skipping self....");
+            if (p.equals(Paths.get(CURRENT_DIR).resolve("data.json"))) {
+                System.out.println("skipping moved file");
                 continue;
             }
 
             String json = new String(Files.readAllBytes(p));
-            if (StringUtils.contains(json, currentPath)) {
+            if (StringUtils.contains(json, CURRENT_DIR)) {
                 System.out.println("Found broken link copying to collection: " + p.toString());
-
-                json = json.replaceAll(currentPath,  targetDir.toString());
+/*                json = json.replaceAll(CURRENT_DIR,  DEST_DIR);
                 try (InputStream in = new ByteArrayInputStream(json.getBytes())) {
                     FileUtils.copyInputStreamToFile(in, collectionRoot.resolve(master.relativize(p)).toFile());
-                }
+                }*/
             }
-        }*/
+        }
     }
 }
