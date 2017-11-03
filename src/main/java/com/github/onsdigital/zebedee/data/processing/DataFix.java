@@ -69,8 +69,7 @@ public class DataFix {
             dest.mkdirs();
             System.out.println(format("dest:\n\texists? {0}\n\turi: {1}" + Files.exists(dest.toPath()), dest.toString()));
 
-            System.out.println(format("copying: \n{0} \nto: {1}", src.toString(), dest.toString()));
-            //FileUtils.copyFile(src, dest);
+            FileUtils.copyFile(src, dest);
         }
 
 /*
