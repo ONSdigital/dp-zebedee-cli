@@ -1,22 +1,16 @@
 package com.github.onsdigital.zebedee.data.processing;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static java.text.MessageFormat.format;
 
@@ -31,7 +25,6 @@ public class DataFix {
     // The directory to move them to
     //static Path targetDir = Paths.get("economy/economicoutputandproductivity/productivitymeasures/articles/davetest/whoop/");
     //static String[] files = {"f3ebf62a.json", "f3ebf62a.html", "f3ebf62a.xls", "data.json", "page.pdf"};
-
 
     static String[] files = {"0d170e32.json", "0d170e32.png", "0d170e32.xls", "71153eee.json", "data.json", "page.pdf"};
 
@@ -60,7 +53,7 @@ public class DataFix {
         System.out.println("directories created successfully");
 
         // The current location
-        Path srcPath  = master.resolve(CURRENT_DIR);
+        Path srcPath = master.resolve(CURRENT_DIR);
 
         for (String filename : files) {
             File src = srcPath.resolve(filename).toFile();
@@ -87,10 +80,16 @@ public class DataFix {
         }
 
         System.out.println("fixed link in moved data.json");
-
         List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(master);
-        List<Path> brokenLinks = new ArrayList<>();
+        System.out.println("Searching for broken links in master");
+        findLinks(masterJsonFiles);
 
+        List<Path> collectionsJsonFiles = new DataJsonFinder().findJsonFiles(collectionsDir);
+        System.out.println("Searching for broken links in collections");
+        findLinks(collectionsJsonFiles);
+    }
+
+    public static void findLinks(List<Path> masterJsonFiles) throws IOException {
         System.out.println("Searching for broken links...");
         for (Path p : masterJsonFiles) {
             if (p.toString().contains(CURRENT_DIR)) {
@@ -100,11 +99,7 @@ public class DataFix {
 
             String json = new String(Files.readAllBytes(p));
             if (StringUtils.contains(json, CURRENT_DIR)) {
-                System.out.println("Found broken link copying to collection: " + p.toString());
-/*                json = json.replaceAll(CURRENT_DIR,  DEST_DIR);
-                try (InputStream in = new ByteArrayInputStream(json.getBytes())) {
-                    FileUtils.copyInputStreamToFile(in, collectionRoot.resolve(master.relativize(p)).toFile());
-                }*/
+                System.out.println("Identified potential broken link: " + p.toString());
             }
         }
     }
