@@ -59,14 +59,15 @@ public class DataFix {
         for (String filename : files) {
             File src = currentDir.resolve(filename).toFile();
 
-            Path move = master.relativize(src.toPath());
-            moves.add("/" + FilenameUtils.removeExtension(move.toString()));
+            Path move = master.resolve(src.toPath());
+            System.out.println("src exists?: " + Files.exists(move));
 
             File dest = collectionRoot.resolve(targetDir).resolve(filename).toFile();
             dest.mkdirs();
+            System.out.println("dest exists?: " + Files.exists(dest.toPath()));
 
             System.out.println(MessageFormat.format("copying: \n{0} \nto: {1}", src.toString(), dest.toString()));
-            FileUtils.copyFile(src, dest);
+            //FileUtils.copyFile(src, dest);
         }
 
 /*
