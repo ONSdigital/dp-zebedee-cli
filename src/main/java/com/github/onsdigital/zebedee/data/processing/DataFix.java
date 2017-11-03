@@ -78,7 +78,7 @@ public class DataFix {
         System.out.println("Fixing this data.json links...");
         Path dataJsonPath = collectionRoot.resolve(targetCollectionDir).resolve("data.json");
         String dataJson = new String(Files.readAllBytes(dataJsonPath));
-        dataJson = dataJson.replaceAll(CURRENT_DIR, DEST_DIR);
+        dataJson = dataJson.replaceAll(CURRENT_DIR + "/", DEST_DIR);
 
         try (BufferedWriter br = Files.newBufferedWriter(dataJsonPath)) {
             br.write(dataJson);
@@ -99,7 +99,7 @@ public class DataFix {
             }
 
             String json = new String(Files.readAllBytes(p));
-            if (StringUtils.contains(json, CURRENT_DIR)) {
+            if (StringUtils.contains(json, CURRENT_DIR + "\"") || StringUtils.contains(json, CURRENT_DIR + " \"")) {
                 System.out.println("Found broken link copying to collection: " + p.toString());
 /*                json = json.replaceAll(CURRENT_DIR,  DEST_DIR);
                 try (InputStream in = new ByteArrayInputStream(json.getBytes())) {
