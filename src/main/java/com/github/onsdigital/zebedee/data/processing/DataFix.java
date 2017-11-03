@@ -26,20 +26,18 @@ import static java.text.MessageFormat.format;
 public class DataFix {
 
     //static final String currentPath = "/economy/economicoutputandproductivity/productivitymeasures/articles/davetest";
-    static final String currentPath = "/economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket";
-
     // The directory the files are currently in.
     //static Path currentDir = Paths.get("/Users/dave/Desktop/zebedee-data/content/zebedee/master/economy/economicoutputandproductivity/productivitymeasures/articles/davetest");
-    static Path currentDir = Paths.get("/economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket");
-
     // The directory to move them to
     //static Path targetDir = Paths.get("economy/economicoutputandproductivity/productivitymeasures/articles/davetest/whoop/");
-    static Path targetDir = Paths.get("/economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016");
-
-    // The names of the files to move.
     //static String[] files = {"f3ebf62a.json", "f3ebf62a.html", "f3ebf62a.xls", "data.json", "page.pdf"};
+
+
     static String[] files = {"0d170e32.json", "0d170e32.png", "0d170e32.xls", "71153eee.json", "data.json", "page.pdf"};
 
+    static final String DEST_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016";
+
+    static final String CURRENT_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket";
 
     public static void fix(String[] args) throws IOException, InterruptedException {
 
@@ -47,27 +45,31 @@ public class DataFix {
         Path collectionsDir = Paths.get(args[2]);
         String collectionName = args[3];
 
-        System.out.println(format("master: {0}, collectionsDir: {1}, collectionName: {2}", master,
-                collectionsDir, collectionName));
+        System.out.println(format("master: {0}, collectionsDir: {1}, collectionName: {2}", master, collectionsDir, collectionName));
 
         System.out.println("creating collection...");
         CollectionCreator.CreateCollection(collectionsDir, collectionName);
+        System.out.println("collection created successfully");
 
+        System.out.println("collection directories...");
         Path collectionRoot = collectionsDir.resolve(collectionName).resolve("inprogress");
 
-        Path targetCollectionDir = collectionRoot.resolve("economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016");
+        // The new location
+        Path targetCollectionDir = collectionRoot.resolve(DEST_DIR);
         targetCollectionDir.toFile().mkdirs();
+        System.out.println("directories created successfully");
 
-        Path srcPath  = master.resolve("economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket");
+        // The current location
+        Path srcPath  = master.resolve(CURRENT_DIR);
 
         for (String filename : files) {
             File src = srcPath.resolve(filename).toFile();
 
             Path move = master.resolve(src.toPath());
-            System.out.println(format("src:\n\texists? {0}\n\turi: {1}" + Files.exists(move), move.toString()));
+            System.out.println(format("src:\n\turi: {1}", move.toString()));
 
             File dest = targetCollectionDir.resolve(filename).toFile();
-            System.out.println(format("dest:\n\texists? {0}\n\turi: {1}" + Files.exists(dest.toPath()), dest.toString()));
+            System.out.println(format("dest:\n\turi: {0}", dest.toString()));
 
             FileUtils.copyFile(src, dest);
         }
