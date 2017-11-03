@@ -28,7 +28,7 @@ public class DataFix {
 
     // The directory the files are currently in.
     //static Path currentDir = Paths.get("/Users/dave/Desktop/zebedee-data/content/zebedee/master/economy/economicoutputandproductivity/productivitymeasures/articles/davetest");
-    static Path currentDir = Paths.get("/economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016");
+    static Path currentDir = Paths.get("/economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket");
 
     // The directory to move them to
     //static Path targetDir = Paths.get("economy/economicoutputandproductivity/productivitymeasures/articles/davetest/whoop/");
