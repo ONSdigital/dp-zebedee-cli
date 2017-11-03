@@ -43,7 +43,10 @@ public class DataFix {
 
         Path master = Paths.get(args[1]);
         Path collectionsDir = Paths.get(args[2]);
-        String collectionName = args[1];
+        String collectionName = args[3];
+
+        System.out.println(MessageFormat.format("master: {0}, collectionsDir: {1}, collectionName: {2}", master,
+                collectionsDir, collectionName));
 
         CollectionCreator.CreateCollection(collectionsDir, collectionName);
 
@@ -60,6 +63,7 @@ public class DataFix {
             moves.add("/" + FilenameUtils.removeExtension(move.toString()));
 
             File dest = collectionRoot.resolve(targetDir).resolve(filename).toFile();
+            dest.mkdirs();
 
             System.out.println(MessageFormat.format("copying: \n{0} \nto: {1}", src.toString(), dest.toString()));
             FileUtils.copyFile(src, dest);
