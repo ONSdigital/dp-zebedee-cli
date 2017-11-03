@@ -50,11 +50,14 @@ public class DataFix {
         System.out.println(format("master: {0}, collectionsDir: {1}, collectionName: {2}", master,
                 collectionsDir, collectionName));
 
+        System.out.println("creating collection...");
         CollectionCreator.CreateCollection(collectionsDir, collectionName);
 
         Path collectionRoot = collectionsDir
                 .resolve(collectionName)
                 .resolve("inprogress");
+
+        targetDir.toFile().mkdirs();
 
         List<String> moves = new ArrayList<>();
 
@@ -66,7 +69,6 @@ public class DataFix {
             System.out.println(format("src:\n\texists? {0}\n\turi: {1}" + Files.exists(move), move.toString()));
 
             File dest = collectionRoot.resolve(targetDir).resolve(filename).toFile();
-            dest.mkdirs();
             System.out.println(format("dest:\n\texists? {0}\n\turi: {1}" + Files.exists(dest.toPath()), dest.toString()));
 
             FileUtils.copyFile(src, dest);
