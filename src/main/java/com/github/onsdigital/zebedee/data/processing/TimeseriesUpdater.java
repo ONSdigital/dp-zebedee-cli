@@ -61,7 +61,7 @@ public class TimeseriesUpdater {
             String uri = dataIndex.getUriForCdid(cdid.toLowerCase());
 
             if (uri == null) {
-                logDebug("TimeSeries data not found in data index").cdid(cdid).log();
+                //logDebug("TimeSeries data not found in data index").cdid(cdid).log();
                 return;
             }
 
@@ -70,7 +70,7 @@ public class TimeseriesUpdater {
                 uri += "/" + dataset;
 
                 TimeSeries timeSeries = (TimeSeries) compoundContentReader.getContent(uri);
-                logDebug("Updating timeseries.").cdid(cdid).addParameter("uri", uri).log();
+                //logDebug("Updating timeseries.").cdid(cdid).addParameter("uri", uri).log();
 
                 timeSeries.setNotes(new ArrayList<>());
                 timeSeries.getNotes().add("Following a quality review it has been identified that the methodology used to estimate elements of purchased software within gross fixed capital formation (GFCF) has led to some double counting from 1997 onwards. When this issue is amended in The Blue Book 2017 it will reduce the level of GFCF across the period by around 1.1% per year. The average impact on quarter-on-quarter GFCF growth is negative 0.02% and the average impact on quarter-on-quarter GDP growth is 0.00%.");
