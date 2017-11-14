@@ -33,6 +33,7 @@ public class ForceDeleteCollection {
         System.out.println(args[2]);
 
         Path target = collectionsDir.resolve(collectionName);
+        System.out.println(target.toString());
 
         if (Files.exists(target)) {
             System.out.println(format("collection {0} exists, proceeding with delete", collectionName));

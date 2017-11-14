@@ -86,6 +86,12 @@ public class Cli {
                 .argName("<master path> <collectiions path> <collection name>")
                 .numberOfArgs(2)
                 .build());
+        options.addOption(builder("datafix2")
+                .desc("")
+                .argName("<master path>")
+                .numberOfArgs(1)
+                .build());
+
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -114,9 +120,20 @@ public class Cli {
             } else if (line.hasOption(REMOVE_COLLECTION)) {
                 ForceDeleteCollection.delete(args);
             } else if (line.hasOption("datafix")) {
-                DataFix.fix(args);
-            }
-            else {
+                try {
+                    DataFix.fix(args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            } else if (line.hasOption("datafix2")) {
+                    try {
+                        DataFix.fixPartDeux(args);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
+            } else {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.setWidth(150);
                 formatter.printHelp("zebedee-cli", options);

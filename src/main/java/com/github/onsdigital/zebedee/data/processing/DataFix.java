@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Scanner;
 
 import static java.text.MessageFormat.format;
 
@@ -19,7 +19,7 @@ import static java.text.MessageFormat.format;
  */
 public class DataFix {
 
-    /*static String[] files = {"f3ebf62a.json", "f3ebf62a.html", "f3ebf62a.xls", "data.json", "page.pdf"};
+/*    static String[] files = {"f3ebf62a.json", "f3ebf62a.html", "f3ebf62a.xls", "data.json", "page.pdf"};
     static final String CURRENT_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/davetest";
     static final String DEST_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/davetest/whoop";*/
 
@@ -28,7 +28,7 @@ public class DataFix {
     static final String DEST_DIR = "economy/economicoutputandproductivity/productivitymeasures/articles/gdpandthelabourmarket/octtodec2016";
 
 
-    public static void fix(String[] args) throws IOException, InterruptedException {
+    public static void fix(String[] args) throws Exception {
 
         Path master = Paths.get(args[1]);
         Path collectionsDir = Paths.get(args[2]);
@@ -72,8 +72,6 @@ public class DataFix {
 
         try (BufferedWriter br = Files.newBufferedWriter(dataJsonPath)) {
             br.write(dataJson);
-        } catch (Exception e) {
-            System.out.println(e.toString());
         }
 
         List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(master);
@@ -94,8 +92,84 @@ public class DataFix {
                 System.out.println("\t" + collectionsDir.relativize(uri).toString());
             }
         }
+    }
 
-        System.out.println("\n[complete]");
+    public static void fixPartDeux(String[] args) throws Exception {
+        Path master = Paths.get(args[1]);
+
+        System.out.println("");
+        System.out.println(format("[Datafix] delete moved files from {0}\n", CURRENT_DIR));
+
+        System.out.println(format("[config]\n\tmaster: {0}\n", master));
+
+        List<String> verificationFailures = new ArrayList<>();
+        List<String> incollection = new ArrayList<>();
+        System.out.println("[verifying safe to delete files]");
+
+        for (String f : files) {
+            Path target = master.resolve(DEST_DIR).resolve(f);
+            if (!Files.exists(target)) {
+                verificationFailures.add(target.toString());
+            }
+        }
+
+        if (!verificationFailures.isEmpty()) {
+            StringBuilder sb = new StringBuilder("[verification failure: cannot proceed as some of the files do not " +
+                    "exit in the updated location]");
+            verificationFailures.stream().forEach(failure -> sb.append("\n\t" + failure));
+            sb.append("\nfix and try again");
+            System.out.println(sb.toString());
+            System.exit(1);
+        }
+
+        System.out.println("[Checking for broken links]");
+
+        List<String> brokenLinks = findLinks(master, new DataJsonFinder().findJsonFiles(master), false);
+        if (!brokenLinks.isEmpty()) {
+            System.out.println("[Found files in master containing a direct/partial match of the uri of moved the content]");
+            System.out.println("[Please check each file to ensure no links are broken]");
+
+            brokenLinks.stream().forEach(link -> System.out.println("\t" + link));
+
+            if (!stdiin("[Do to want to continue Y/n?]")) {
+                System.out.println("Cancelling delete");
+                System.exit(1);
+            }
+        }
+
+        System.out.println("[Proceeding with delete]");
+        System.out.println("[The following files will be deleted]");
+
+        for (String f : files) {
+            Path target = master.resolve(CURRENT_DIR).resolve(f);
+            System.out.println("\t" + target.toString());
+        }
+
+        if (stdiin("[Are you sure you wish to continue?]")) {
+            for (String f : files) {
+                Path target = master.resolve(CURRENT_DIR).resolve(f);
+                System.out.println("deleting: " + target.toString());
+                Files.delete(target);
+            }
+            System.out.println("[data fix completed]");
+        } else {
+            System.out.println("Cancelling delete");
+            System.exit(1);
+        }
+    }
+
+    public static boolean stdiin(String message) {
+        Scanner sc = new Scanner(System.in);
+        String proceed = "";
+        boolean valid = false;
+
+        do {
+            System.out.println(message);
+            proceed = sc.next().toUpperCase();
+            valid = proceed.equalsIgnoreCase("Y") || proceed.equalsIgnoreCase("N");
+        } while (!valid);
+
+        return proceed.equalsIgnoreCase("Y");
     }
 
     public static List<String> findLinks(Path master, List<Path> masterJsonFiles, boolean debug) throws IOException {
