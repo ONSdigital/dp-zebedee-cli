@@ -91,6 +91,11 @@ public class Cli {
                 .argName("<master path>")
                 .numberOfArgs(1)
                 .build());
+        options.addOption(builder("taxonomyfix")
+                .desc("myfix")
+                .argName("<master path>, <collections_dir>")
+                .numberOfArgs(1)
+                .build());
 
 
         CommandLineParser parser = new DefaultParser();
@@ -119,6 +124,8 @@ public class Cli {
                 TimeseriesUpdater.updateTimeseries(args);
             } else if (line.hasOption(REMOVE_COLLECTION)) {
                 ForceDeleteCollection.delete(args);
+            } else if (line.hasOption("taxonomyfix")) {
+                TaxonomyFix.Go(args);
             } else if (line.hasOption("datafix")) {
                 try {
                     DataFix.fix(args);

@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -67,6 +68,7 @@ public class ContentMover {
 
 
     private static void FixLinksAndWriteBackToCollection(String sourceUri, String destinationUri, Set<Path> collectionFilesToFixLinksIn) throws IOException {
+        System.out.println(MessageFormat.format("Fixing\nfrom: {0}\nto:{1}", sourceUri, destinationUri));
 
         String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
         String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
