@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
+import static com.github.onsdigital.zebedee.data.processing.MyLogger.log;
+
 public class CollectionCreator {
 
     public static void createCollection(String[] args) throws Exception {
@@ -35,6 +37,7 @@ public class CollectionCreator {
 
         String filename = PathUtils.toFilename(collectionName);
         collection.id = filename + "-" + Random.id();
+        log("creating collection collectionID: {0}", collection.id);
         Collection.CreateCollectionFolders(filename, destination);
 
         //collection.addEvent(new Event(new Date(), EventType.CREATED, "dp-zebedee-cli"));

@@ -3,6 +3,8 @@ package com.github.onsdigital.zebedee.data.processing;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.github.onsdigital.zebedee.data.processing.MyLogger.log;
+
 /**
  * Created by dave on 16/01/2018.
  */
@@ -22,23 +24,27 @@ public class TaxonomyFix {
         Path collectionsDir = Paths.get(args[2]);
 
         String collectionName = "";
+        String src = "";
 
-        for (String src : targets) {
-            collectionName = Paths.get(src).getFileName().toString();
 
+        for (int i=0; i < targets.length; i++) {
+            src = targets[i];
+            collectionName = "move_" + Paths.get(src).getFileName().toString();
+
+            log("beginning move {0} of {1}, collection: {2}", i + 1, targets.length, collectionName);
             Path collectionInProgPath = collectionsDir.resolve(collectionName).resolve("inprogress");
 
             try {
                 CollectionCreator.CreateCollection(collectionsDir, collectionName);
             } catch (Exception e) {
-                e.printStackTrace();
+                log("error creating collection: {0}", e.getMessage());
+                System.exit(1);
             }
 
             Path collectionDir = collectionsDir.resolve(collectionName);
 
             String dest = src.replace("cuturalidentity", "culturalidentity");
             try {
-                System.out.println("");
                 ContentMover.moveContent(new String[]{
                         "",
                         masterPath.toString(),
@@ -46,12 +52,12 @@ public class TaxonomyFix {
                         src,
                         dest
                 });
-                System.out.println("move completed for " + src + " collection: " + collectionName);
+                log("move completed for src: {0} collection: {1}", src, collectionName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            System.out.println("all taxonomy moves completed successfully");
+            System.out.println("");
         }
+        System.out.println("all taxonomy moves completed successfully");
     }
 }

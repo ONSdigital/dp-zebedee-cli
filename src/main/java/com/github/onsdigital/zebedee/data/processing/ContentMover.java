@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import static com.github.onsdigital.zebedee.data.processing.MyLogger.log;
+
 public class ContentMover {
 
     public static void moveContent(String[] args) throws InterruptedException, BadRequestException, NotFoundException, IOException {
@@ -39,23 +41,23 @@ public class ContentMover {
         Path sourceDirectory = source.resolve(URIUtils.removeLeadingSlash(sourceUri));
         Path destinationDirectory = destination.resolve(URIUtils.removeLeadingSlash(destinationUri));
 
-        System.out.println("Moving from: "  + sourceDirectory + " to: " + destinationDirectory);
+        log("moving from: {0}, to: {1}", sourceDirectory.toString(), destinationDirectory.toString());
 
         FileUtils.copyDirectory(sourceDirectory.toFile(), destinationDirectory.toFile());
 
         // delete the old directory on publishing and log a message to delete the directory on live
-        System.out.println("Directory to delete: " + sourceUri);
+        log("directory to delete: {0}", sourceUri);
         //FileUtils.deleteDirectory(sourceDirectory);
 
         String latestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
 
-        System.out.println("Searching collection content for links for fix...." + destination);
+        log("searching collection content for links for fix: {0}", destination);
         // do the same process for files in the collection in case they need links fixing
         List<Path> collectionJsonFiles = new DataJsonFinder().findJsonFiles(destination);
         Set<Path> collectionFilesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, collectionJsonFiles);
         FixLinksAndWriteBackToCollection(sourceUri, destinationUri, collectionFilesToFixLinksIn);
 
-        System.out.println("Searching master content for links for fix....");
+        log("searching master content for links for fix");
         // identify pages in master content with links to fix - search source path for old URI
         List<Path> masterJsonFiles = new DataJsonFinder().findJsonFiles(source);
         Set<Path> filesToFixLinksIn = findJsonFilesWithLinksToFix(sourceDirectory, sourceUri, latestUri, masterJsonFiles);
@@ -68,7 +70,7 @@ public class ContentMover {
 
 
     private static void FixLinksAndWriteBackToCollection(String sourceUri, String destinationUri, Set<Path> collectionFilesToFixLinksIn) throws IOException {
-        System.out.println(MessageFormat.format("Fixing\nfrom: {0}\nto:{1}", sourceUri, destinationUri));
+        log("fixing from: {0} to:{1}", sourceUri, destinationUri);
 
         String sourceLatestUri = Paths.get(sourceUri).getParent().resolve("latest").toString();
         String destinationLatestUri = Paths.get(destinationUri).getParent().resolve("latest").toString();
@@ -77,7 +79,6 @@ public class ContentMover {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll(sourceUri, destinationUri);
             content = content.replaceAll(sourceLatestUri, destinationLatestUri);
-            System.out.println("destinationFilePath = " + path);
             Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         }
     }
@@ -94,7 +95,6 @@ public class ContentMover {
             content = content.replaceAll(sourceLatestUri, destinationLatestUri);
 
             Path destinationFilePath = destination.resolve(source.relativize(path));
-            System.out.println("destinationFilePath = " + destinationFilePath);
 
             Path parentDirectory = destinationFilePath.getParent();
             if (!Files.exists(parentDirectory))
@@ -110,7 +110,7 @@ public class ContentMover {
         for (Path jsonPath : jsonFiles) {
 
             if (jsonPath.toString().contains(sourceDirectory.toString())){
-                System.out.println("Skipping file as it live under the directory being moved :" + jsonPath);
+                log("skipping file as it lives under the directory being moved: {0}", jsonPath);
                 continue;
             }
 
@@ -120,7 +120,7 @@ public class ContentMover {
                     String line = scanner.nextLine();
                     if (line.contains(sourceUri) || line.contains(latestUri)) {
 
-                        System.out.println("Fix links in file: " + jsonPath);
+                        log("fixing links in file: {0}", jsonPath);
                         filesToFixLinksIn.add(jsonPath);
                         break;
                     }
